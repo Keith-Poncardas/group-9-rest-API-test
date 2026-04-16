@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: group9-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    # Port 3306 not exposed to host — API uses internal Docker network.
+    # To connect from a GUI tool, use: "3307:3306" (avoids local MySQL conflict)
+    volumes:
+      # Persist MySQL data across restarts
+      - mysql_data:/var/lib/mysql
+      # Auto-run SQL on first boot
+      - ./sql/setup.sql:/docker-entrypoint-initdb.d/setup.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: group9-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Override DB_HOST so Node connects to the db service, not localhost
+      DB_HOST: db
+    ports:
+      - "${PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
