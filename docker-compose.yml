@@ -1,7 +1,7 @@
 services:
   db:
     image: mysql:8.0
-    container_name: group9-db
+    container_name: keith-poncardas-rest-api-db
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
@@ -14,7 +14,17 @@ services:
       # Auto-run SQL on first boot
       - ./sql/setup.sql:/docker-entrypoint-initdb.d/setup.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${DB_PASSWORD}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: group9-api
+    container_name: keith-poncardas-rest-api-api
     restart: unless-stopped
     env_file:
       - .env

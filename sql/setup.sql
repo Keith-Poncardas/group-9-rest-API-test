@@ -1,6 +1,6 @@
 -- Create Database
-CREATE DATABASE IF NOT EXISTS Garcia;
-USE Garcia;
+CREATE DATABASE IF NOT EXISTS Poncardas;
+USE Poncardas;
 
 -- Create Students Table
 CREATE TABLE IF NOT EXISTS students (
